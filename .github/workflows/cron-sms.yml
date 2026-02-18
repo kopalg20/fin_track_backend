@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Trigger SMS parsing cron
         run: |
-          curl -X POST "${{ secrets.BACKEND_URL }}/fintrack/internal/run-cron" \
+          curl -X POST "https://fin-track1.onrender.com/fintrack/internal/run-cron" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             --fail --silent --show-error
