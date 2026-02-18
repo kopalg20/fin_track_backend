@@ -1,0 +1,18 @@
+name: SMS Cron Job
+
+on:
+  schedule:
+    # Runs every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI for testing
+
+jobs:
+  trigger-sms-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger SMS parsing cron
+        run: |
+          curl -X POST "${{ secrets.BACKEND_URL }}/fintrack/internal/run-cron" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
