@@ -9,15 +9,30 @@ import {
   deleteUser,
   addSavingGoal,
   addTransaction,
-  findAllGoals, // Import the findAllGoals function
-  getTransaction // Import the getTransaction function
+  findAllGoals,
+  getTransaction,
+  runSmsCron
 } from '../fintrackFunctions.js';
 
 const router = express.Router();
 
+// 12. Internal Cron — SMS generation, parsing, fraud detection & storage
+router.post('/internal/run-cron', async (req, res) => {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+
+  if (token !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const { data, error } = await runSmsCron();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Cron executed successfully', ...data });
+});
+
 // 1. Find users
 router.post('/findUsers', async (req, res) => {
-  const{username, password } = req.body;
+  const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
